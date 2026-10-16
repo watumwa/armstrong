@@ -70,3 +70,12 @@ html[data-theme="dark"] .clinical-info-card dt,html[data-theme="dark"] .clinical
 html[data-theme="dark"] .role-quick-entry,html[data-theme="dark"] .agreement-entry,html[data-theme="dark"] .qr-entry,html[data-theme="dark"] .schedule-entry,html[data-theme="dark"] .collector-entry,html[data-theme="dark"] .verify-entry{background:#15382f;border-color:#2e6551;color:#e5f3ea}
 html[data-theme="dark"] .theme-toggle{background:#dff5e9;color:#123c30;border-color:#b7e5d0}
 @media(max-width:760px){.global-theme-control{right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}.theme-toggle{min-width:88px;min-height:44px;padding:9px 12px}html[data-theme="dark"] .responsive-facility-table tr{background:#132633;border-color:#294454}html[data-theme="dark"] .responsive-facility-table td{border-color:#294454}}
+
+/* Additional coverage for independently styled operational pages */
+html[data-theme="dark"] :is(.app,.main,main,.content) :is(section,article)[class*="card"],html[data-theme="dark"] :is(.app,.main,main,.content) [class*="panel"],html[data-theme="dark"] :is(.app,.main,main,.content) [class*="surface"]{border-color:#294454}
+html[data-theme="dark"] :is(.app,.main,main,.content) :is(h1,h2,h3,h4){color:#e7f1f5}
+html[data-theme="dark"] :is(.app,.main,main,.content) :is(label,small){color:#b6cbd6}
+html[data-theme="dark"] .clinical-tabs button{color:#b2c7d2}
+html[data-theme="dark"] .clinical-tabs button.active{color:#78dcb0}
+html[data-theme="dark"] .role-launch-card:hover{background:#1b3945;border-color:#4a977b}
+html[data-theme="dark"] .clinical-waste-grid small{color:#203e4c}
