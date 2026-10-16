@@ -19,7 +19,7 @@ Open http://localhost:3000.
 
 ## Current features
 
-Responsive operations dashboard, facility directory and registration, demo collections and payments, staff preview, schedules and agreement listing, reporting, and role-based UI previews. Dedicated routes: `/agreements/new` (three-step printable agreement draft) and `/qr-registry` (printable QR sticker preview and separate collection/payment demo forms), and `/schedules` (collector assignments, filters, status updates and workload summaries).
+Responsive operations dashboard, facility directory and registration, demo collections and payments, staff preview, schedules and agreement listing, reporting, and role-based UI previews. Dedicated routes: `/agreements/new` (three-step printable agreement draft) and `/qr-registry` (printable QR sticker preview and separate collection/payment demo forms), and `/schedules` (collector assignments, filters, status updates and workload summaries), and `/collector` (mobile task queue and unverified collection evidence submissions).
 
 ## Critical limitations
 
