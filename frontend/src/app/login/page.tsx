@@ -1,0 +1,7 @@
+'use client';
+import {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {LockKeyhole,LogIn,ShieldCheck} from 'lucide-react';
+export default function Login(){const router=useRouter();const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});const data=await r.json();if(!r.ok)throw new Error(data.error||'Sign in failed');router.replace('/');router.refresh()}catch(e){setError(e instanceof Error?e.message:'Sign in failed')}finally{setBusy(false)}}
+return <main className="auth-screen"><form className="auth-card" onSubmit={submit}><div className="auth-icon"><ShieldCheck size={28}/></div><h1>Armstrong</h1><p>Clinical waste operations · Secure staff access</p><label>Email address<input type="email" autoComplete="username" required value={email} onChange={e=>setEmail(e.target.value)}/></label><label>Password<input type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/></label>{error&&<p role="alert" className="auth-error">{error}</p>}<button type="submit" disabled={busy}><LogIn size={17}/>{busy?'Signing in…':'Sign in'}</button><small><LockKeyhole size={13}/> Accounts are created by the system administrator.</small></form></main>}
