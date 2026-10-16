@@ -1,0 +1,10 @@
+* [33mde77c47[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m changes configs
+* [33mb5a8370[m deploy: bootstrap Django schema in Vercel service
+* [33m8306a71[m changes configs
+* [33m3b6eaeb[m security(django): enforce same-origin browser writes for cookie authenticated API
+* [33m046f602[m feat(django): role-secured REST endpoints for facilities agreements collections payments reports and audit
+* [33m3c9684e[m feat(django): role-secured REST endpoints for facilities agreements collections payments reports and audit
+* [33m15560de[m feat(django): role-secured REST endpoints for facilities agreements collections payments reports and audit
+* [33m1112b7e[m feat(django): role-secured REST endpoints for facilities agreements collections payments reports and audit
+* [33m253b60d[m feat(django): role-secured REST endpoints for facilities agreements collections payments reports and audit
+* [33me2bec24[m feat(django): add PostgreSQL-backed Django REST project and shared schema models
