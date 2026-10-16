@@ -1,46 +1,34 @@
-# Armstrong Global Solutions — Waste Management Platform
+# Armstrong Global Solutions — Unified Platform
 
-## Architecture
+## Deployment model
+**One Vercel project** pointing at the `frontend/` directory. The Next.js application serves both UI and server-side API routes at the **same origin** (`/api/*`). PostgreSQL is an external managed database (e.g. Neon). There is **no separately deployed Django service** in this architecture. The earlier Django plan has been superseded to meet the single-deployment requirement.
 
-- **Frontend:** Next.js App Router, React, TypeScript, Tailwind CSS, Lucide icons.
-- **Backend (later phase):** Django + Django REST Framework.
-- **Database (later phase):** PostgreSQL.
+## Initial backend foundation (October 2026)
+- Login via server-validated credentials; signed, HttpOnly, SameSite cookies.
+- Administrator-only staff listing and account creation for Administrator, Supervisor, Waste Collector and Revenue Officer.
+- PostgreSQL schema for users, facilities, agreements, collections, payments and audit logs.
+- Authenticated facility directory and creation, GPS coordinate endpoint, collection scheduling API, pending payment recording API and database-backed report summary.
+- Google Maps facility view at `/maps`: embedded map requires `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and **verified** facility coordinates. Do not invent locations.
+- `/users` staff provisioning interface; `/login` sign-in interface.
+- Optional **fictional** demo seed at `db/demo_seed.sql`. It contains no real customer data and should not be run on production.
 
-## Run the frontend
+## One-project setup
+1. In Vercel, set **Root Directory = `frontend`**. Build command `npm run build`; framework Next.js. One project serves both pages and API routes.
+2. Provision a PostgreSQL database and set `DATABASE_URL` and a unique `AUTH_SECRET` (32+ characters) in the **same Vercel project**. See `frontend/.env.example`. Do not commit secrets.
+3. Apply `frontend/db/schema.sql` to the database using your SQL editor before attempting to sign in.
+4. On a trusted computer, set `DATABASE_URL`, `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters), then run `cd frontend && npm install && node scripts/bootstrap-admin.mjs`. This creates the first administrator only when none exists. Do not leave the bootstrap password in deployed environment variables.
+5. Redeploy, open `/login`, sign in and create other staff accounts at `/users`.
+6. Optionally configure `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in Vercel, restrict it to your website's HTTP referrers and enable the **Maps Embed API** in Google Cloud. GPS coordinates must be recorded/verified before facilities appear on the map.
 
+## Current integration boundaries — important
+This is a **backend foundation, not a finished production system**. The home dashboard now loads authenticated role information and facility records from PostgreSQL; facility creation saves to the database. The Reports page uses server summary data. The dedicated collector, scheduling, QR, verification and agreement demo pages still use local state or browser storage and **are not yet connected to the database**. Dashboard payment and collection modal activity is still demo-only; do not use it to acknowledge actual cash or issue official receipts. The payment API creates *pending* records, never automatically confirmed payments. Facility payment badges on the home dashboard are placeholders until reconciliation is implemented. Role enforcement exists on implemented server endpoints; remaining workflows require endpoint-level authorization, validation and audit logging before production use.
+
+## Deployment safety
+No database connection or migrations have been executed remotely. No real customer data has been inserted. The login gate intentionally prevents access to operational pages until the database, administrator and authentication secret are configured. Build, migration and device tests are required before go-live.
+
+## Frontend development
 ```bash
-git clone https://github.com/watumwa/armstrong.git
-cd armstrong/frontend
+cd frontend
 npm install
 npm run dev
 ```
-
-Open http://localhost:3000.
-
-## Current features
-
-Responsive operations dashboard, facility directory and registration, demo collections and payments, staff preview, schedules and agreement listing, reporting, and role-based UI previews. Dedicated routes: `/agreements/new` (three-step printable agreement draft) and `/qr-registry` (printable QR sticker preview and separate collection/payment demo forms), and `/schedules` (collector assignments, filters, status updates and workload summaries), and `/collector` (mobile task queue and unverified collection evidence submissions), and `/verification` (supervisor review, demo approval and correction requests).
-
-## Critical limitations
-
-This is a **frontend-only demonstration**. All data is illustrative and resets on refresh. Role switching is **not authorization**. QR stickers encode demo client IDs, not secure credentials. There is no real QR scanning, GPS verification, payment processing, ledger, invoices, backend, or persistent storage. The map intentionally does not invent facility coordinates.
-
-The `backend/` Django project will be added only when backend development is approved.
-
-## Git workflow
-
-Per project instructions, completed changes are committed directly to `main`.
-
-**Workflow limitation:** Collector demo submissions now appear in the supervisor demo queue **on the same browser and origin** using localStorage. This is not server synchronization, secure persistence or cross-device sharing. Do not enter real medical or financial information.
-
-## Install as a PWA
-
-Run the Next.js frontend on an HTTPS deployment (localhost also works for development). Supported browsers can offer **Install Armstrong**. On iPhone/iPad use the browser Share menu → **Add to Home Screen**. The PWA manifest and generated app icons enable standalone display. The service worker caches only the offline fallback route, not sensitive operational records. Offline data entry, sync, secure QR check-in and background uploads are **not implemented**. Test installability on target devices after deploying over HTTPS.
-
-## Role-oriented frontend navigation
-
-The main dashboard now provides simplified **Administrator**, **Supervisor**, **Waste Collector**, and **Revenue Officer** navigation with contextual quick actions. Switching roles is a UI preview only and **does not enforce permissions or authenticate users**. Do not use these frontend menus as an authorization boundary; enforce access controls in Django before production use. The current reorganization preserves existing demonstration workflows and does not modify backend logic.
-
-## Clinical waste facility profiles
-
-The dashboard's Facilities table now opens a **central facility profile** with tabs for overview, service agreement, collection schedule, collection history, payments and QR identification. A temporary Armstrong clinical waste brand mark is used until the official company logo is supplied. The profile shows real links to existing frontend demos, but agreement documents and scheduling data are **not yet linked** to individual facilities. Collection/payment history in the profile reflects only dashboard-session demonstration events. No backend was changed.
