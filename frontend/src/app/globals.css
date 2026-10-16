@@ -79,3 +79,9 @@ html[data-theme="dark"] .clinical-tabs button{color:#b2c7d2}
 html[data-theme="dark"] .clinical-tabs button.active{color:#78dcb0}
 html[data-theme="dark"] .role-launch-card:hover{background:#1b3945;border-color:#4a977b}
 html[data-theme="dark"] .clinical-waste-grid small{color:#203e4c}
+
+/* Appearance control belongs in the top navigation, never over page content. */
+.global-theme-control{position:fixed;top:13px;right:110px;bottom:auto;z-index:45}
+.theme-toggle{min-width:88px;min-height:42px;padding:8px 12px;border-radius:10px;box-shadow:none}
+@media(max-width:760px){.global-theme-control{top:9px;right:89px;bottom:auto;z-index:45}.theme-toggle{min-width:44px;width:44px;height:42px;padding:0;border-radius:10px}.theme-toggle span{display:none}}
+@media(max-width:380px){.global-theme-control{right:81px}.top-actions{gap:4px}.top-actions .badge{display:none}}
