@@ -16,9 +16,6 @@ const seed:Client[]=[
 ];
 const staff=[{name:'David Kato',role:'Waste Collector',initials:'DK',visits:12},{name:'Peter Ssenyonjo',role:'Waste Collector',initials:'PS',visits:9},{name:'Sarah Namuli',role:'Revenue Officer',initials:'SN',visits:8},{name:'Grace Akello',role:'Supervisor',initials:'GA',visits:14}];
 const money=(n:number)=>'UGX '+n.toLocaleString('en-UG');
-const groups:{title:string;items:{name:Page;icon:typeof Activity}[]}[]=[
-{title:'WORKSPACE',items:[{name:'Overview',icon:LayoutDashboard},{name:'Clients',icon:Users},{name:'Agreements',icon:FileText},{name:'Collections',icon:Truck},{name:'Schedules',icon:CalendarDays},{name:'Map & Routes',icon:MapPin}]},
-{title:'FINANCE & TEAM',items:[{name:'Payments',icon:Wallet},{name:'Staff',icon:ShieldCheck},{name:'Reports',icon:TrendingUp},{name:'QR Registry',icon:QrCode},{name:'Settings',icon:Settings}]}];
 const roleNavigation:Record<Role,{title:string;items:Page[]}[]>={
 Administrator:[{title:'OVERVIEW',items:['Overview','Clients','Agreements']},{title:'OPERATIONS',items:['Schedules','Collections','QR Registry','Map & Routes']},{title:'FINANCE & ADMIN',items:['Payments','Staff','Reports','Settings']}],
 Supervisor:[{title:'MY WORKSPACE',items:['Overview','Schedules','Collections']},{title:'CONTROL',items:['QR Registry','Reports']}],
