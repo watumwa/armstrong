@@ -85,3 +85,30 @@ html[data-theme="dark"] .clinical-waste-grid small{color:#203e4c}
 .theme-toggle{min-width:88px;min-height:42px;padding:8px 12px;border-radius:10px;box-shadow:none}
 @media(max-width:760px){.global-theme-control{top:9px;right:89px;bottom:auto;z-index:45}.theme-toggle{min-width:44px;width:44px;height:42px;padding:0;border-radius:10px}.theme-toggle span{display:none}}
 @media(max-width:380px){.global-theme-control{right:81px}.top-actions{gap:4px}.top-actions .badge{display:none}}
+
+/* Unified authentication, staff administration and maps */
+.auth-screen{min-height:100dvh;display:grid;place-items:center;padding:24px;background:linear-gradient(145deg,#e9f6ef,#eef3f8)}
+.auth-card{width:min(100%,410px);display:grid;gap:15px;background:#fff;border:1px solid #dce8e4;border-radius:18px;padding:32px;box-shadow:0 14px 45px #153c4b17}
+.auth-icon{width:54px;height:54px;display:grid;place-items:center;background:#e4f5eb;color:#117850;border-radius:14px}
+.auth-card h1{margin:0;font-size:28px;color:#133e40}.auth-card p{font-size:13px;line-height:1.5;margin:0 0 8px}
+.auth-card label,.admin-card label{display:grid;gap:7px;color:#375466;font-size:13px;font-weight:700}
+.auth-card input,.admin-card input,.admin-card select{width:100%;min-height:46px;border:1px solid #cadbdc;border-radius:9px;padding:10px 12px;background:#fff;color:#193d49;font-size:16px}
+.auth-card button,.admin-card button:not(.map-pick){display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;border:0;border-radius:9px;background:#137b57;color:#fff;font-weight:800;padding:11px}
+.auth-card button:disabled,.admin-card button:disabled{opacity:.6}
+.auth-card small{display:flex;align-items:center;gap:7px;color:#79919d;font-size:11px}
+.auth-error{color:#a83737!important;background:#fff0f0;padding:11px;border-radius:8px;font-size:12px}
+.admin-workspace{max-width:1200px;margin:0 auto;padding:35px 22px 80px;min-height:100dvh}
+.admin-workspace>header{margin-bottom:20px}.admin-workspace h1{font-size:27px;margin:18px 0 8px}.admin-workspace p{font-size:13px;line-height:1.5}
+.admin-columns{display:grid;grid-template-columns:minmax(280px,420px) 1fr;gap:20px}
+.admin-card{background:#fff;border:1px solid #dfe9eb;border-radius:14px;padding:22px;display:grid;align-content:start;gap:14px;margin-top:16px;min-width:0}
+.admin-card h2{font-size:16px;margin:0 0 7px}.admin-user{display:grid;gap:5px;padding:12px 0;border-bottom:1px solid #e6ecee;font-size:13px}
+.admin-user span,.admin-user small{color:#718b99}.map-pick{border:0;background:none;color:#157b57;text-align:left;font-weight:800;padding:5px 0;cursor:pointer}
+.authenticated-role{font-size:12px;font-weight:700;color:#36576b;background:#edf6f1;border-radius:9px;padding:12px}
+.live-data-status{font-size:11px;color:#477d67;margin:-9px 0 16px}
+html[data-theme="dark"] .auth-screen{background:linear-gradient(145deg,#081923,#102b32)}
+html[data-theme="dark"] .auth-card,html[data-theme="dark"] .admin-card{background:#132633;border-color:#294454;color:#e7f1f5}
+html[data-theme="dark"] .auth-card h1,html[data-theme="dark"] .admin-workspace h1,html[data-theme="dark"] .admin-card h2{color:#e7f1f5}
+html[data-theme="dark"] .auth-card label,html[data-theme="dark"] .admin-card label,html[data-theme="dark"] .authenticated-role{color:#c1d7e1}
+html[data-theme="dark"] .authenticated-role{background:#183b3d}
+html[data-theme="dark"] .admin-user{border-color:#294454}
+@media(max-width:760px){.auth-card{padding:23px}.admin-workspace{padding:24px 13px 85px}.admin-columns{grid-template-columns:1fr}.admin-card{padding:16px}.authenticated-role{font-size:11px;padding:9px;max-width:100%;overflow-wrap:anywhere}}
