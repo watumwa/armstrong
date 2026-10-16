@@ -17,7 +17,7 @@ The browser uses relative `/api/...` calls, so it always reaches the Django serv
 ## One-project setup
 1. In Vercel, change the existing project's **Root Directory** to `.` (the repository root) and set the framework preset to **Services**. Commit `vercel.json` before deploying; it defines the `frontend` and `backend` services and routes `/api/*` to Django before the frontend catch-all.
 2. In that same Vercel project, configure `DATABASE_URL`, `AUTH_SECRET` (a unique 32+ character value), `DJANGO_SECRET_KEY` (a different unique 32+ character value), and `DJANGO_ALLOWED_HOSTS` (include your production domain plus `.vercel.app`). Both services receive the shared project environment. Do not commit secrets or set `ADMIN_PASSWORD` in Vercel.
-3. Apply `frontend/db/schema.sql` to the database using its SQL editor before attempting to sign in. These tables are the current source of truth; the Django models deliberately use `managed=False`.
+3. The Django service applies its idempotent `backend/schema.sql` during the Vercel backend build. It creates or verifies the required empty tables and indexes only; it does not seed, update, or delete application data. Django models deliberately use `managed=False`.
 4. On a trusted computer, set `DATABASE_URL`, `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters), then run `cd frontend && npm install && node scripts/bootstrap-admin.mjs`. This creates the first administrator only when none exists.
 5. Deploy from the repository root. With Git integration, every push builds both services once; with the CLI, use `vercel deploy` (preview) or `vercel deploy --prod` (production) from this directory.
 6. Verify `GET /api/health`, then open `/login`, sign in and create other staff accounts at `/users`.
@@ -27,7 +27,7 @@ The browser uses relative `/api/...` calls, so it always reaches the Django serv
 This is a **backend foundation, not a finished production system**. The home dashboard now loads authenticated role information and facility records through Django from PostgreSQL; facility creation saves to the database. The Reports page uses Django server summary data. The dedicated collector, scheduling, QR, verification and agreement demo pages still use local state or browser storage and **are not yet connected to the database**. Dashboard payment and collection modal activity is still demo-only; do not use it to acknowledge actual cash or issue official receipts. The payment API creates *pending* records, never automatically confirmed payments. Facility payment badges on the home dashboard are placeholders until reconciliation is implemented. Role enforcement exists on implemented server endpoints; remaining workflows require endpoint-level authorization, validation and audit logging before production use.
 
 ## Deployment safety
-No database connection or migrations have been executed remotely. No real customer data has been inserted. The login gate intentionally prevents access to operational pages until the database, administrator and authentication secret are configured. Build, migration and device tests are required before go-live.
+Vercel injects the Neon database connection directly into the deployment; it is not committed to this repository. The build-time schema step contains only idempotent `CREATE ... IF NOT EXISTS` statements and does not seed real customer data. The login gate intentionally prevents access to operational pages until an administrator account exists. Build and device tests are required before go-live.
 
 ## Frontend development
 ```bash

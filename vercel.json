@@ -5,7 +5,10 @@
       "root": "frontend"
     },
     "backend": {
-      "root": "backend"
+      "root": "backend",
+      "framework": "django",
+      "entrypoint": "core.wsgi:application",
+      "buildCommand": "python scripts/apply_schema.py"
     }
   },
   "rewrites": [

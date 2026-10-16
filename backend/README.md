@@ -1,6 +1,6 @@
 # Armstrong Django API
 
-Django REST Framework models map to the existing `frontend/db/schema.sql` PostgreSQL tables. Models intentionally use `managed=False`: **do not run Django migrations expecting them to create these tables**. The existing SQL schema is the current source of truth; migration to Django-managed migrations needs an explicit data-preserving plan.
+Django REST Framework models map to the PostgreSQL tables defined in `schema.sql`. Models intentionally use `managed=False`: **do not run Django migrations expecting them to create these tables**. Vercel runs `scripts/apply_schema.py` at backend build time; its DDL is idempotent and does not seed or delete application data. Keep this schema aligned with `frontend/db/schema.sql`, the frontend's local bootstrap copy.
 
 Vercel Services deploys this Django application and the Next.js frontend together from the repository root. `vercel.json` sends every `/api/*` request to Django, while all other paths go to Next.js. The public API stays on the same domain as the browser and owns login, logout, session validation, facilities, users, collections, payments and reports.
 
