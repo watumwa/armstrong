@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';export async function GET(){return NextResponse.json({service:'armstrong',status:'online',databaseConfigured:Boolean(process.env.DATABASE_URL),authenticationConfigured:Boolean(process.env.AUTH_SECRET)})}
