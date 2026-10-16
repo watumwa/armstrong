@@ -1,46 +1,32 @@
-# Armstrong Waste Management — Frontend
+# Armstrong Global Solutions — Waste Management Platform
 
-Responsive React + TypeScript + Vite prototype for Armstrong Global Solutions SMC Ltd.
+## Architecture
 
-## Start locally
+- **Frontend:** Next.js App Router, React, TypeScript, Tailwind CSS, Lucide icons.
+- **Backend (later phase):** Django + Django REST Framework.
+- **Database (later phase):** PostgreSQL.
 
-Requires Node.js 20+.
+## Run the frontend
 
 ```bash
 git clone https://github.com/watumwa/armstrong.git
-cd armstrong
+cd armstrong/frontend
 npm install
 npm run dev
 ```
 
-Visit the Vite URL printed in the terminal (typically http://localhost:5173).
+Open http://localhost:3000.
 
-Production build:
+## Current features
 
-```bash
-npm run build
-```
+Responsive operations dashboard, facility directory and registration, demo collections and payments, staff preview, schedules and agreement listing, QR registry placeholder, reporting, and role-based UI previews.
 
-## Frontend features
+## Critical limitations
 
-- Responsive navy and green management dashboard
-- Facilities directory, search, CSV export and temporary client registration
-- Service agreement, collection schedule and QR registry previews
-- Collection and payment demonstration forms
-- Field-role preview switcher (administrator, supervisor, waste collector, revenue officer)
-- Staff roster, account reporting, client details and activity history
-- Map registry placeholder that **does not invent GPS coordinates**
+This is a **frontend-only demonstration**. All data is illustrative and resets on refresh. Role switching is **not authorization**. There is no real QR scanning, GPS verification, payment processing, ledger, invoices, backend, or persistent storage. The map intentionally does not invent facility coordinates.
 
-## Important limitations
+The `backend/` Django project will be added only when backend development is approved.
 
-**This is a frontend-only demonstration.** All facilities and staff are fictional examples. Data is in memory and resets on refresh. No authenticated access, secure QR scanner, GPS verification, payment processing, legal receipts, persistent storage, or backend exists yet. Payment status is illustrative and is not a financial ledger.
+## Git workflow
 
-The role switcher is for visual preview only and **does not enforce permissions**. Do not use this system to handle real clinical waste or money until backend authorization, auditing, validation and production workflows are implemented.
-
-## Delivery
-
-All frontend changes are committed to `main` as requested. Backend implementation is deferred.
-
-## Next frontend iterations
-
-Add dedicated agreement wizard, QR print preview, detailed collection manifests, payment allocation and invoice screens, responsive route scheduling, component tests, and realistic empty/error/loading states.
+Per project instructions, completed changes are committed directly to `main`.
