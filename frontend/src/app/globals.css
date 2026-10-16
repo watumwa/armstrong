@@ -44,3 +44,29 @@ html,body{max-width:100%;overflow-x:clip}button,a,select,input,textarea{touch-ac
 @media(min-width:761px) and (max-width:1100px){.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.table-wrap table{min-width:740px}}
 @media(max-width:380px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi{padding:11px}.kpi>strong{font-size:19px}.responsive-facility-table tr{grid-template-columns:1fr}.responsive-facility-table td{grid-column:1/-1}.role-launch-grid{grid-template-columns:1fr 1fr}.clinical-waste-grid{gap:5px}.clinical-waste-grid small{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
+
+/* Persistent Armstrong appearance preference: all frontend routes */
+:root{color-scheme:light}
+.global-theme-control{position:fixed;right:16px;bottom:16px;z-index:95}.theme-toggle{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;min-width:100px;padding:10px 15px;background:#123e52;color:#fff;border:1px solid #3b7782;border-radius:999px;font-size:13px;font-weight:800;box-shadow:0 5px 22px #0b283b44}.theme-toggle:hover{background:#1a6658}.theme-toggle:focus-visible{outline:3px solid #70d9ad;outline-offset:3px}
+html[data-theme="dark"]{color-scheme:dark;background:#091520;color:#e6eff5}
+html[data-theme="dark"] body{background:#091520;color:#e6eff5}
+html[data-theme="dark"] .app,html[data-theme="dark"] .main,html[data-theme="dark"] .content{background:#091520;color:#e6eff5}
+html[data-theme="dark"] .sidebar{background:#071a26;border-right:1px solid #233e4b}
+html[data-theme="dark"] .topbar,html[data-theme="dark"] .panel,html[data-theme="dark"] .kpi,html[data-theme="dark"] .clinical-info-card,html[data-theme="dark"] .clinical-profile-metrics>div,html[data-theme="dark"] .role-launch-card,html[data-theme="dark"] .modal,html[data-theme="dark"] .field-card,html[data-theme="dark"] .staff-card{background:#132633;color:#e5eff4;border-color:#294454;box-shadow:none}
+html[data-theme="dark"] .clinical-profile-header{background:linear-gradient(135deg,#15352f,#132b37);border-color:#2b4e48}
+html[data-theme="dark"] .page-heading h1,html[data-theme="dark"] .clinical-profile-title h2,html[data-theme="dark"] .panel-title h2,html[data-theme="dark"] .events h2,html[data-theme="dark"] .kpi>strong,html[data-theme="dark"] .clinical-info-card h3,html[data-theme="dark"] .role-launch-card strong,html[data-theme="dark"] .facility-cell strong,html[data-theme="dark"] .staff-card h3,html[data-theme="dark"] .field-card h3,html[data-theme="dark"] .clinical-info-card dd,html[data-theme="dark"] .clinical-profile-metrics strong{color:#e8f3f7}
+html[data-theme="dark"] p,html[data-theme="dark"] .page-heading p,html[data-theme="dark"] .clinical-info-card p,html[data-theme="dark"] .clinical-profile-title p,html[data-theme="dark"] .clinical-profile-metrics span,html[data-theme="dark"] .clinical-info-card dt,html[data-theme="dark"] .role-launch-card span,html[data-theme="dark"] .facility-cell small{color:#a3bbc9}
+html[data-theme="dark"] .table-wrap table,html[data-theme="dark"] .table-wrap td,html[data-theme="dark"] .table-wrap th{color:#d9e9f0;border-color:#2a4452}
+html[data-theme="dark"] .table-wrap th{background:#1a3543;color:#b7cbd4}
+html[data-theme="dark"] .table-wrap tr{border-color:#2a4452}
+html[data-theme="dark"] .searchbox,html[data-theme="dark"] .heading-actions select,html[data-theme="dark"] input,html[data-theme="dark"] textarea,html[data-theme="dark"] select{background:#142c39!important;color:#e8f3f7!important;border-color:#345463!important}
+html[data-theme="dark"] input::placeholder,html[data-theme="dark"] textarea::placeholder{color:#8ba5b5}
+html[data-theme="dark"] .searchbox input{background:transparent!important}
+html[data-theme="dark"] .btn.subtle,html[data-theme="dark"] .row-action{background:#203d4b;color:#d5efe3;border-color:#345463}
+html[data-theme="dark"] .demo-banner,html[data-theme="dark"] .clinical-callout{background:#3c321d;border-color:#68522a;color:#f2d6a2}
+html[data-theme="dark"] .clinical-empty,html[data-theme="dark"] .map-placeholder{background:#172f3b;color:#adc5d1;border-color:#345463}
+html[data-theme="dark"] .clinical-tabs{border-color:#345463}
+html[data-theme="dark"] .clinical-info-card dt,html[data-theme="dark"] .clinical-info-card dd,html[data-theme="dark"] .clinical-history-row{border-color:#2c4553}
+html[data-theme="dark"] .role-quick-entry,html[data-theme="dark"] .agreement-entry,html[data-theme="dark"] .qr-entry,html[data-theme="dark"] .schedule-entry,html[data-theme="dark"] .collector-entry,html[data-theme="dark"] .verify-entry{background:#15382f;border-color:#2e6551;color:#e5f3ea}
+html[data-theme="dark"] .theme-toggle{background:#dff5e9;color:#123c30;border-color:#b7e5d0}
+@media(max-width:760px){.global-theme-control{right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}.theme-toggle{min-width:88px;min-height:44px;padding:9px 12px}html[data-theme="dark"] .responsive-facility-table tr{background:#132633;border-color:#294454}html[data-theme="dark"] .responsive-facility-table td{border-color:#294454}}
