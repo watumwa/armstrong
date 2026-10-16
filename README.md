@@ -40,3 +40,7 @@ Run the Next.js frontend on an HTTPS deployment (localhost also works for develo
 ## Role-oriented frontend navigation
 
 The main dashboard now provides simplified **Administrator**, **Supervisor**, **Waste Collector**, and **Revenue Officer** navigation with contextual quick actions. Switching roles is a UI preview only and **does not enforce permissions or authenticate users**. Do not use these frontend menus as an authorization boundary; enforce access controls in Django before production use. The current reorganization preserves existing demonstration workflows and does not modify backend logic.
+
+## Clinical waste facility profiles
+
+The dashboard's Facilities table now opens a **central facility profile** with tabs for overview, service agreement, collection schedule, collection history, payments and QR identification. A temporary Armstrong clinical waste brand mark is used until the official company logo is supplied. The profile shows real links to existing frontend demos, but agreement documents and scheduling data are **not yet linked** to individual facilities. Collection/payment history in the profile reflects only dashboard-session demonstration events. No backend was changed.
