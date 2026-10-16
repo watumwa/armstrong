@@ -31,4 +31,8 @@ The `backend/` Django project will be added only when backend development is app
 
 Per project instructions, completed changes are committed directly to `main`.
 
-**Workflow limitation:** Collector and supervisor pages currently use independent illustrative datasets. A collector's new submission will not appear in the supervisor queue until shared backend storage and APIs are implemented.
+**Workflow limitation:** Collector demo submissions now appear in the supervisor demo queue **on the same browser and origin** using localStorage. This is not server synchronization, secure persistence or cross-device sharing. Do not enter real medical or financial information.
+
+## Install as a PWA
+
+Run the Next.js frontend on an HTTPS deployment (localhost also works for development). Supported browsers can offer **Install Armstrong**. On iPhone/iPad use the browser Share menu → **Add to Home Screen**. The PWA manifest and generated app icons enable standalone display. The service worker caches only the offline fallback route, not sensitive operational records. Offline data entry, sync, secure QR check-in and background uploads are **not implemented**. Test installability on target devices after deploying over HTTPS.
