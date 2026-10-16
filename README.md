@@ -1,7 +1,9 @@
 # Armstrong Global Solutions — Unified Platform
 
 ## Deployment model
-**One Vercel project** pointing at the `frontend/` directory. The Next.js application serves both UI and server-side API routes at the **same origin** (`/api/*`). PostgreSQL is an external managed database (e.g. Neon). There is **no separately deployed Django service** in this architecture. The earlier Django plan has been superseded to meet the single-deployment requirement.
+**One Vercel Services project** rooted at this repository. The Next.js frontend is served at `/`; Django is the only public API service and is served at `/api/*`. Both services build, preview, deploy and roll back together on one domain. PostgreSQL remains an external managed database (for example Neon), not a separately deployed application server.
+
+The browser uses relative `/api/...` calls, so it always reaches the Django service on the same origin. This avoids a hard-coded backend hostname and avoids CORS configuration for the web application. The older `frontend/src/app/api` route files are retained as rollback source only; the Vercel rewrite prevents public traffic from reaching them. Do not add new Next API handlers.
 
 ## Initial backend foundation (October 2026)
 - Login via server-validated credentials; signed, HttpOnly, SameSite cookies.
@@ -13,15 +15,16 @@
 - Optional **fictional** demo seed at `db/demo_seed.sql`. It contains no real customer data and should not be run on production.
 
 ## One-project setup
-1. In Vercel, set **Root Directory = `frontend`**. Build command `npm run build`; framework Next.js. One project serves both pages and API routes.
-2. Provision a PostgreSQL database and set `DATABASE_URL` and a unique `AUTH_SECRET` (32+ characters) in the **same Vercel project**. See `frontend/.env.example`. Do not commit secrets.
-3. Apply `frontend/db/schema.sql` to the database using your SQL editor before attempting to sign in.
-4. On a trusted computer, set `DATABASE_URL`, `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters), then run `cd frontend && npm install && node scripts/bootstrap-admin.mjs`. This creates the first administrator only when none exists. Do not leave the bootstrap password in deployed environment variables.
-5. Redeploy, open `/login`, sign in and create other staff accounts at `/users`.
-6. Optionally configure `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in Vercel, restrict it to your website's HTTP referrers and enable the **Maps Embed API** in Google Cloud. GPS coordinates must be recorded/verified before facilities appear on the map.
+1. In Vercel, change the existing project's **Root Directory** to `.` (the repository root) and set the framework preset to **Services**. Commit `vercel.json` before deploying; it defines the `frontend` and `backend` services and routes `/api/*` to Django before the frontend catch-all.
+2. In that same Vercel project, configure `DATABASE_URL`, `AUTH_SECRET` (a unique 32+ character value), `DJANGO_SECRET_KEY` (a different unique 32+ character value), and `DJANGO_ALLOWED_HOSTS` (include your production domain plus `.vercel.app`). Both services receive the shared project environment. Do not commit secrets or set `ADMIN_PASSWORD` in Vercel.
+3. Apply `frontend/db/schema.sql` to the database using its SQL editor before attempting to sign in. These tables are the current source of truth; the Django models deliberately use `managed=False`.
+4. On a trusted computer, set `DATABASE_URL`, `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters), then run `cd frontend && npm install && node scripts/bootstrap-admin.mjs`. This creates the first administrator only when none exists.
+5. Deploy from the repository root. With Git integration, every push builds both services once; with the CLI, use `vercel deploy` (preview) or `vercel deploy --prod` (production) from this directory.
+6. Verify `GET /api/health`, then open `/login`, sign in and create other staff accounts at `/users`.
+7. Optionally configure `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in Vercel, restrict it to your website's HTTP referrers and enable the **Maps Embed API** in Google Cloud. GPS coordinates must be recorded/verified before facilities appear on the map.
 
 ## Current integration boundaries — important
-This is a **backend foundation, not a finished production system**. The home dashboard now loads authenticated role information and facility records from PostgreSQL; facility creation saves to the database. The Reports page uses server summary data. The dedicated collector, scheduling, QR, verification and agreement demo pages still use local state or browser storage and **are not yet connected to the database**. Dashboard payment and collection modal activity is still demo-only; do not use it to acknowledge actual cash or issue official receipts. The payment API creates *pending* records, never automatically confirmed payments. Facility payment badges on the home dashboard are placeholders until reconciliation is implemented. Role enforcement exists on implemented server endpoints; remaining workflows require endpoint-level authorization, validation and audit logging before production use.
+This is a **backend foundation, not a finished production system**. The home dashboard now loads authenticated role information and facility records through Django from PostgreSQL; facility creation saves to the database. The Reports page uses Django server summary data. The dedicated collector, scheduling, QR, verification and agreement demo pages still use local state or browser storage and **are not yet connected to the database**. Dashboard payment and collection modal activity is still demo-only; do not use it to acknowledge actual cash or issue official receipts. The payment API creates *pending* records, never automatically confirmed payments. Facility payment badges on the home dashboard are placeholders until reconciliation is implemented. Role enforcement exists on implemented server endpoints; remaining workflows require endpoint-level authorization, validation and audit logging before production use.
 
 ## Deployment safety
 No database connection or migrations have been executed remotely. No real customer data has been inserted. The login gate intentionally prevents access to operational pages until the database, administrator and authentication secret are configured. Build, migration and device tests are required before go-live.
