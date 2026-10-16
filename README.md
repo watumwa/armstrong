@@ -32,3 +32,14 @@ cd frontend
 npm install
 npm run dev
 ```
+
+## Four-role test credentials
+No real login passwords are stored in this repository. To create **temporary test accounts** in an **empty, non-production PostgreSQL database**, apply the schema first and run:
+
+```bash
+cd frontend
+npm install
+ALLOW_TEST_USERS=yes node scripts/create-test-users.mjs
+```
+
+Provide `DATABASE_URL` in your terminal environment before running the command. The script creates one account each for Administrator, Supervisor, Waste Collector and Revenue Officer, with unique randomly generated passwords printed **once** to the terminal. Save them in a password manager. The script refuses to run in `NODE_ENV=production` or when any user already exists. For a real deployment, create only the initial administrator using `scripts/bootstrap-admin.mjs`, then create staff through `/users`.
