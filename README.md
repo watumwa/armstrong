@@ -36,3 +36,7 @@ Per project instructions, completed changes are committed directly to `main`.
 ## Install as a PWA
 
 Run the Next.js frontend on an HTTPS deployment (localhost also works for development). Supported browsers can offer **Install Armstrong**. On iPhone/iPad use the browser Share menu → **Add to Home Screen**. The PWA manifest and generated app icons enable standalone display. The service worker caches only the offline fallback route, not sensitive operational records. Offline data entry, sync, secure QR check-in and background uploads are **not implemented**. Test installability on target devices after deploying over HTTPS.
+
+## Role-oriented frontend navigation
+
+The main dashboard now provides simplified **Administrator**, **Supervisor**, **Waste Collector**, and **Revenue Officer** navigation with contextual quick actions. Switching roles is a UI preview only and **does not enforce permissions or authenticate users**. Do not use these frontend menus as an authorization boundary; enforce access controls in Django before production use. The current reorganization preserves existing demonstration workflows and does not modify backend logic.
