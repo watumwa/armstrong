@@ -1,12 +1,26 @@
 name: Fleet phase checks
 on:
   push:
-    branches: [feat/fleet-foundation]
+    branches: [feat/fleet-foundation, feat/fleet-verification]
   pull_request:
     branches: [main]
 jobs:
   django:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd 'pg_isready -U test -d test'
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       DJANGO_SECRET_KEY: test-only-secret-key-long-enough-for-django-checks
       DATABASE_URL: postgres://test:test@localhost:5432/test
@@ -19,6 +33,9 @@ jobs:
       - run: pip install -r backend/requirements.txt
       - run: python -m compileall -q backend
       - run: python backend/manage.py check
+      - run: python backend/scripts/apply_schema.py
+      - run: python backend/scripts/apply_schema.py
+      - run: python backend/scripts/verify_fleet_schema.py
   frontend:
     runs-on: ubuntu-latest
     defaults:
