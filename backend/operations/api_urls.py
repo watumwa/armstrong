@@ -1,9 +1,10 @@
 from django.urls import path
 
-from . import api, fleet_api, fleet_gps, fleet_verification, fleet_reports
+from . import api, fleet_api, fleet_gps, fleet_verification, fleet_reports, fleet_sync
 
 
 urlpatterns = [
+    path('fleet/sync', fleet_sync.sync_events),
     path('fleet/reports/summary', fleet_reports.fleet_summary),
     path('fleet/facilities/<uuid:facility_id>/qr', fleet_verification.facility_qr),
     path('fleet/stops/<uuid:stop_id>/verify', fleet_verification.verify_stop),
