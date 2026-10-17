@@ -70,4 +70,4 @@ class AuditLog(models.Model):
  class Meta:db_table="audit_log";managed=False
 
 # Register fleet models with Django's application model loader.
-from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop, LocationPing  # noqa: E402,F401
+from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop, LocationPing, StopVerification, FleetSyncEvent  # noqa: E402,F401

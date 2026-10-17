@@ -1,7 +1,7 @@
 name: Fleet phase checks
 on:
   push:
-    branches: [feat/fleet-foundation, feat/fleet-verification]
+    branches: [feat/fleet-foundation, feat/fleet-verification, feat/fleet-phases-3-5]
   pull_request:
     branches: [main]
 jobs:

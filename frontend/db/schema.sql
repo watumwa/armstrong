@@ -68,3 +68,35 @@ CREATE TABLE IF NOT EXISTS fleet_location_pings (
 );
 CREATE INDEX IF NOT EXISTS fleet_location_trip_time ON fleet_location_pings(trip_id,captured_at DESC);
 CREATE INDEX IF NOT EXISTS fleet_location_driver_time ON fleet_location_pings(driver_id,received_at DESC);
+
+-- Phase 3: facility arrival verification and collection proof
+CREATE TABLE IF NOT EXISTS fleet_stop_verifications (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ trip_stop_id uuid NOT NULL REFERENCES fleet_trip_stops(id),
+ driver_id uuid NOT NULL REFERENCES users(id),
+ event_id uuid NOT NULL UNIQUE,
+ latitude double precision NOT NULL CHECK(latitude BETWEEN -90 AND 90),
+ longitude double precision NOT NULL CHECK(longitude BETWEEN -180 AND 180),
+ accuracy_m double precision NOT NULL CHECK(accuracy_m BETWEEN 0 AND 1000),
+ distance_m double precision,
+ within_geofence boolean,
+ qr_verified boolean NOT NULL DEFAULT false,
+ verified_at timestamptz NOT NULL DEFAULT now(),
+ notes text NOT NULL DEFAULT '',
+ UNIQUE(trip_stop_id)
+);
+CREATE INDEX IF NOT EXISTS fleet_verifications_driver_time ON fleet_stop_verifications(driver_id,verified_at DESC);
+
+-- Phase 4: durable server-side sync acknowledgements, one per driver event.
+CREATE TABLE IF NOT EXISTS fleet_sync_events (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ driver_id uuid NOT NULL REFERENCES users(id),
+ client_event_id uuid NOT NULL,
+ event_type text NOT NULL CHECK(event_type IN ('stop.verify')),
+ trip_stop_id uuid NOT NULL REFERENCES fleet_trip_stops(id),
+ status text NOT NULL CHECK(status IN ('accepted','rejected')),
+ result jsonb NOT NULL DEFAULT '{}'::jsonb,
+ received_at timestamptz NOT NULL DEFAULT now(),
+ UNIQUE(driver_id,client_event_id)
+);
+CREATE INDEX IF NOT EXISTS fleet_sync_events_driver_time ON fleet_sync_events(driver_id,received_at DESC);
