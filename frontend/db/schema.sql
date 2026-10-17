@@ -8,3 +8,48 @@ CREATE TABLE IF NOT EXISTS payments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(
 CREATE TABLE IF NOT EXISTS audit_log(id bigserial PRIMARY KEY,actor_id uuid REFERENCES users(id),action text NOT NULL,entity_type text NOT NULL,entity_id text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
 CREATE INDEX IF NOT EXISTS idx_collections_facility_date ON collections(facility_id,scheduled_at DESC);
 CREATE INDEX IF NOT EXISTS idx_payments_facility_date ON payments(facility_id,paid_at DESC);
+
+-- Fleet phase 1: additive, idempotent schema; no existing rows modified.
+CREATE TABLE IF NOT EXISTS fleet_vehicles (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ registration text NOT NULL UNIQUE,
+ label text NOT NULL,
+ status text NOT NULL DEFAULT 'available' CHECK(status IN ('available','maintenance','inactive')),
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS fleet_assignments (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ vehicle_id uuid NOT NULL REFERENCES fleet_vehicles(id),
+ driver_id uuid NOT NULL REFERENCES users(id),
+ assigned_by_id uuid NOT NULL REFERENCES users(id),
+ assigned_at timestamptz NOT NULL DEFAULT now(),
+ ended_at timestamptz,
+ CHECK(ended_at IS NULL OR ended_at >= assigned_at)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS fleet_active_vehicle_assignment ON fleet_assignments(vehicle_id) WHERE ended_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS fleet_active_driver_assignment ON fleet_assignments(driver_id) WHERE ended_at IS NULL;
+CREATE TABLE IF NOT EXISTS fleet_trips (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ vehicle_id uuid NOT NULL REFERENCES fleet_vehicles(id),
+ driver_id uuid NOT NULL REFERENCES users(id),
+ created_by_id uuid NOT NULL REFERENCES users(id),
+ status text NOT NULL DEFAULT 'planned' CHECK(status IN ('planned','active','completed','cancelled')),
+ scheduled_for timestamptz NOT NULL,
+ started_at timestamptz,
+ ended_at timestamptz,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ CHECK(ended_at IS NULL OR (started_at IS NOT NULL AND ended_at>=started_at))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS fleet_active_vehicle_trip ON fleet_trips(vehicle_id) WHERE status='active';
+CREATE UNIQUE INDEX IF NOT EXISTS fleet_active_driver_trip ON fleet_trips(driver_id) WHERE status='active';
+CREATE TABLE IF NOT EXISTS fleet_trip_stops (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ trip_id uuid NOT NULL REFERENCES fleet_trips(id),
+ facility_id uuid NOT NULL REFERENCES facilities(id),
+ sequence integer NOT NULL CHECK(sequence>0),
+ status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','arrived','completed','missed')),
+ arrived_at timestamptz,
+ completed_at timestamptz,
+ UNIQUE(trip_id,sequence), UNIQUE(trip_id,facility_id)
+);
+CREATE INDEX IF NOT EXISTS fleet_trips_driver_schedule ON fleet_trips(driver_id,scheduled_for DESC);
