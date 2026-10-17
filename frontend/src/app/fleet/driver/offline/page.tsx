@@ -9,6 +9,7 @@ const KEY='armstrong:fleet:offline-stop-events:v1';
 function readQueue():Event[]{try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
 function saveQueue(items:Event[]){localStorage.setItem(KEY,JSON.stringify(items))}
 export default function OfflineCollections(){
+ const [receipts,setReceipts]=useState<string[]>([]),[rejections,setRejections]=useState<string[]>([]);
  const [trips,setTrips]=useState<Trip[]>([]),[trip,setTrip]=useState(''),[stop,setStop]=useState(''),[token,setToken]=useState(''),[notes,setNotes]=useState(''),[queue,setQueue]=useState<Event[]>([]),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
  useEffect(()=>{setQueue(readQueue());fetch('/api/fleet/trips').then(r=>r.json()).then(d=>setTrips((d.trips||[]).filter((t:Trip)=>t.status==='active'))).catch(()=>setMessage('Trips unavailable. Open this page online before going offline.'))},[]);
  const sync=useCallback(async()=>{
@@ -22,6 +23,8 @@ export default function OfflineCollections(){
    const remaining=readQueue().filter(e=>!accepted.has(e.client_event_id));
    saveQueue(remaining);setQueue(remaining);
    const rejected=(d.results||[]).filter((x:{status:string})=>x.status==='rejected');
+   setRejections(rejected.map((x:{client_event_id?:string;error?:string;result?:{error?:string}})=>String(x.client_event_id||'Unknown event')+': '+String(x.result?.error||x.error||'Rejected')));
+   setReceipts((d.results||[]).filter((x:{status:string;result?:{verification_id?:string}})=>x.status==='accepted'&&x.result?.verification_id).map((x:{result:{verification_id:string}})=>x.result.verification_id));
    setMessage(accepted.size+' synced. '+rejected.length+' need review. '+remaining.length+' still pending.');
   }catch(e){setMessage('Sync unavailable; saved events retained. '+String(e))}finally{setBusy(false)}
  },[]);
@@ -47,6 +50,6 @@ export default function OfflineCollections(){
  <label>Signed facility QR token<input value={token} onChange={e=>setToken(e.target.value)} placeholder="Paste scanned token" style={{display:'block',padding:12,width:'100%',marginBottom:16}}/></label>
  <label>Notes<textarea value={notes} onChange={e=>setNotes(e.target.value)} maxLength={1000} style={{display:'block',padding:12,width:'100%',marginBottom:16}}/></label>
  <div style={{display:'flex',gap:12,flexWrap:'wrap'}}><button onClick={capture} disabled={!stop} style={{padding:14}}>Save proof offline</button><button onClick={()=>void sync()} disabled={busy||!queue.length} style={{padding:14}}>{busy?'Syncing...':'Sync saved events'}</button></div>
- <p role="status">{message}</p><h2>Pending sync: {queue.length}</h2>{queue.map(e=><p key={e.client_event_id}>{e.created_at} · {e.trip_stop_id.slice(0,8)} · pending</p>)}
+ <p role="status">{message}</p>{rejections.length>0&&<section role="alert"><h2>Events needing review</h2>{rejections.map((x,i)=><p key={i}>{x}</p>)}</section>}{receipts.length>0&&<section><h2>Verified receipts</h2>{receipts.map(id=><p key={id}><a href={'/api/fleet/receipts/'+id} target="_blank" rel="noreferrer">Open printable receipt {id.slice(0,8)}</a></p>)}</section>}<h2>Pending sync: {queue.length}</h2>{queue.map(e=><p key={e.client_event_id}>{e.created_at} · {e.trip_stop_id.slice(0,8)} · pending</p>)}
  <p>Important: browser storage is not guaranteed durable if app data is cleared or the device is lost. GPS is captured at the time of saving; the server validates location and trip state when syncing. Offline GPS tracking is not enabled.</p></main>
 }

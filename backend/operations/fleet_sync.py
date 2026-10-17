@@ -3,7 +3,7 @@ import uuid
 from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .fleet_models import FleetSyncEvent
+from .fleet_models import FleetSyncEvent, StopVerification
 from .fleet_verification import process_verification
 from .views import check_role
 
@@ -26,8 +26,19 @@ def sync_events(request):
             results.append({"client_event_id":str(event_id),"status":"rejected","error":"Unsupported event type"});continue
         with transaction.atomic():
             prior=FleetSyncEvent.objects.select_for_update().filter(driver=request.user,client_event_id=event_id).first()
+            if prior and (prior.trip_stop_id != stop_id or prior.event_type != "stop.verify"):
+                results.append({"client_event_id":str(event_id),"status":"rejected","error":"Event ID already belongs to a different stop"})
+                continue
             if prior:
                 results.append({"client_event_id":str(event_id),"status":prior.status,"result":prior.result,"replayed":True})
+                continue
+            # Recover an accepted event when the original HTTP response was lost.
+            previous=StopVerification.objects.filter(driver=request.user,event_id=event_id,trip_stop_id=stop_id).first()
+            if previous:
+                result={"verified":True,"duplicate":True,"verification_id":str(previous.id)}
+                FleetSyncEvent.objects.create(driver=request.user,client_event_id=event_id,
+                    event_type="stop.verify",trip_stop_id=stop_id,status="accepted",result=result)
+                results.append({"client_event_id":str(event_id),"status":"accepted","result":result,"replayed":True})
                 continue
             # Keep the client's UUID for verification idempotency.
             class RequestProxy:
