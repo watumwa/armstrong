@@ -68,3 +68,6 @@ class AuditLog(models.Model):
  entity_id=models.TextField()
  created_at=models.DateTimeField(auto_now_add=True)
  class Meta:db_table="audit_log";managed=False
+
+# Register fleet models with Django's application model loader.
+from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop  # noqa: E402,F401
