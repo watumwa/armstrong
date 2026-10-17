@@ -31,6 +31,9 @@ def facility_qr(request, facility_id):
 
 @api_view(["POST"])
 def verify_stop(request,stop_id):
+    return process_verification(request,stop_id)
+
+def process_verification(request,stop_id):
     check_role(request.user,"Waste Collector")
     stop=TripStop.objects.select_related("trip","facility").filter(pk=stop_id,trip__driver=request.user,trip__status="active").first()
     if not stop:return Response({"error":"Active assigned trip stop required"},status=403)
