@@ -1,8 +1,6 @@
 """Trip stop geofence and QR checks. QR tokens are signed, not facility IDs."""
 import math
 import uuid
-from datetime import timedelta
-from django.conf import settings
 from django.core import signing
 from django.db import IntegrityError, transaction
 from django.utils import timezone
