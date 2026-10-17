@@ -94,3 +94,16 @@ class FleetSyncEvent(models.Model):
         managed = False
         db_table = "fleet_sync_events"
         constraints = [models.UniqueConstraint(fields=["driver", "client_event_id"], name="fleet_sync_driver_event_unique")]
+
+class FleetAlert(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    alert_key = models.TextField(unique=True)
+    trip = models.ForeignKey(FleetTrip, null=True, on_delete=models.PROTECT)
+    severity = models.TextField()
+    category = models.TextField()
+    message = models.TextField()
+    resolved_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        managed = False
+        db_table = "fleet_alerts"
