@@ -63,3 +63,20 @@ class LocationPing(models.Model):
     class Meta:
         managed = False
         db_table = "fleet_location_pings"
+
+class StopVerification(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    trip_stop = models.OneToOneField(TripStop, on_delete=models.PROTECT, related_name="verification")
+    driver = models.ForeignKey(StaffUser, on_delete=models.PROTECT)
+    event_id = models.UUIDField(unique=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    accuracy_m = models.FloatField()
+    distance_m = models.FloatField(null=True)
+    within_geofence = models.BooleanField(null=True)
+    qr_verified = models.BooleanField(default=False)
+    verified_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(default="")
+    class Meta:
+        managed = False
+        db_table = "fleet_stop_verifications"
