@@ -100,3 +100,16 @@ CREATE TABLE IF NOT EXISTS fleet_sync_events (
  UNIQUE(driver_id,client_event_id)
 );
 CREATE INDEX IF NOT EXISTS fleet_sync_events_driver_time ON fleet_sync_events(driver_id,received_at DESC);
+
+-- Phase 5: persisted operational exceptions and notification outbox (no paid provider dependency).
+CREATE TABLE IF NOT EXISTS fleet_alerts (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ alert_key text NOT NULL UNIQUE,
+ trip_id uuid REFERENCES fleet_trips(id),
+ severity text NOT NULL CHECK(severity IN ('warning','critical')),
+ category text NOT NULL,
+ message text NOT NULL,
+ resolved_at timestamptz,
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS fleet_alerts_unresolved ON fleet_alerts(created_at DESC) WHERE resolved_at IS NULL;
