@@ -3,8 +3,8 @@ from .models import Facility,Agreement,Collection,Payment,StaffUser
 class FacilitySerializer(serializers.ModelSerializer):
  class Meta:
   model=Facility
-  fields=["id","code","name","type","address","district","phone","latitude","longitude","monthly_fee","collection_day","created_at"]
-  read_only_fields=["id","code","created_at"]
+  fields=["id","code","name","type","address","district","phone","latitude","longitude","monthly_fee","collection_day","sms_opt_in","sms_opt_in_at","created_at"]
+  read_only_fields=["id","code","sms_opt_in_at","created_at"]
  def validate(self,attrs):
   lat=attrs.get("latitude",getattr(self.instance,"latitude",None));lon=attrs.get("longitude",getattr(self.instance,"longitude",None))
   if (lat is None)!=(lon is None):raise serializers.ValidationError("Provide both latitude and longitude or neither.")

@@ -2,26 +2,67 @@
 import math
 import uuid
 from datetime import timedelta
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-from .fleet_models import FleetTrip, LocationPing
-from .views import check_role
+from .fleet_models import FleetTrip, LocationPing, TrackingSession
+from .views import check_role, log
 
 def serialize(p):
     return {"latitude":p.latitude,"longitude":p.longitude,"accuracy_m":p.accuracy_m,
             "captured_at":p.captured_at.isoformat(),"received_at":p.received_at.isoformat(),
             "trip_id":str(p.trip_id)}
 
-@api_view(["POST"])
-def report_location(request, trip_id):
+def _active_driver_trip(request, trip_id):
     check_role(request.user, "Waste Collector")
-    trip=FleetTrip.objects.filter(pk=trip_id,driver=request.user,status="active").first()
+    return FleetTrip.objects.filter(pk=trip_id,driver=request.user,status="active").first()
+
+@api_view(["POST"])
+def start_tracking(request, trip_id):
+    """Record explicit staff-phone tracking consent for an active assigned trip."""
+    trip=_active_driver_trip(request,trip_id)
     if not trip:
         return Response({"error":"Active assigned trip required"},status=403)
+    if request.data.get("consent") is not True:
+        return Response({"error":"Explicit tracking consent is required"},status=400)
+    try:
+        with transaction.atomic():
+            session=TrackingSession.objects.select_for_update().filter(trip=trip,stopped_at__isnull=True).first()
+            if session and session.driver_id!=request.user.id:
+                return Response({"error":"Another driver is tracking this trip"},status=409)
+            already_active = session is not None
+            if not session:
+                session=TrackingSession.objects.create(trip=trip,driver=request.user)
+                log(request.user,"fleet.phone_tracking.started",session)
+    except IntegrityError:
+        return Response({"error":"Tracking session conflict"},status=409)
+    return Response({"session_id":str(session.id),"started_at":session.started_at.isoformat(),"already_active":already_active})
+
+@api_view(["POST"])
+def stop_tracking(request, trip_id):
+    trip=_active_driver_trip(request,trip_id)
+    if not trip:
+        return Response({"error":"Active assigned trip required"},status=403)
+    with transaction.atomic():
+        session=TrackingSession.objects.select_for_update().filter(trip=trip,driver=request.user,stopped_at__isnull=True).first()
+        if not session:
+            return Response({"ok":True,"already_stopped":True})
+        session.stopped_at=timezone.now()
+        session.stop_reason=str(request.data.get("reason","driver_stopped"))[:80]
+        session.save(update_fields=["stopped_at","stop_reason"])
+        log(request.user,"fleet.phone_tracking.stopped",session)
+    return Response({"ok":True})
+
+@api_view(["POST"])
+def report_location(request, trip_id):
+    trip=_active_driver_trip(request,trip_id)
+    if not trip:
+        return Response({"error":"Active assigned trip required"},status=403)
+    if not TrackingSession.objects.filter(trip=trip,driver=request.user,stopped_at__isnull=True).exists():
+        return Response({"error":"Start staff-phone tracking before sending locations"},status=409)
     try:
         lat=float(request.data.get("latitude"))
         lon=float(request.data.get("longitude"))

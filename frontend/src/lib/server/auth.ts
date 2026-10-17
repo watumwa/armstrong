@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { SignJWT,jwtVerify } from 'jose';
-export type Role='Administrator'|'Supervisor'|'Waste Collector'|'Revenue Officer';
+export type Role='Administrator'|'Supervisor'|'Waste Collector'|'Revenue Officer'|'Marketer';
 export type Session={id:string;role:Role;name:string};
 const cookie='armstrong_session';
 function key(){const s=process.env.AUTH_SECRET;if(!s||s.length<32)throw new Error('AUTH_SECRET must be at least 32 characters');return new TextEncoder().encode(s)}

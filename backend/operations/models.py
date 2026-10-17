@@ -23,6 +23,8 @@ class Facility(models.Model):
  longitude=models.FloatField(null=True,blank=True)
  monthly_fee=models.DecimalField(max_digits=12,decimal_places=2,default=0)
  collection_day=models.TextField(null=True,blank=True)
+ sms_opt_in=models.BooleanField(default=False)
+ sms_opt_in_at=models.DateTimeField(null=True,blank=True)
  created_at=models.DateTimeField(auto_now_add=True)
  class Meta:db_table="facilities";managed=False
 class Agreement(models.Model):
@@ -60,6 +62,80 @@ class Payment(models.Model):
  paid_at=models.DateTimeField()
  created_at=models.DateTimeField(auto_now_add=True)
  class Meta:db_table="payments";managed=False
+class Invoice(models.Model):
+ id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+ facility=models.ForeignKey(Facility,on_delete=models.PROTECT,related_name="invoices")
+ invoice_number=models.TextField(unique=True)
+ issue_date=models.DateField()
+ due_date=models.DateField()
+ status=models.TextField(default="issued")
+ currency=models.TextField(default="UGX")
+ subtotal=models.DecimalField(max_digits=12,decimal_places=2,default=0)
+ amount_paid=models.DecimalField(max_digits=12,decimal_places=2,default=0)
+ balance=models.DecimalField(max_digits=12,decimal_places=2,default=0)
+ notes=models.TextField(default="")
+ created_by=models.ForeignKey(StaffUser,on_delete=models.PROTECT,related_name="created_invoices")
+ issued_at=models.DateTimeField(null=True,blank=True)
+ created_at=models.DateTimeField(auto_now_add=True)
+ class Meta:db_table="invoices";managed=False
+class InvoiceLine(models.Model):
+ id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+ invoice=models.ForeignKey(Invoice,on_delete=models.PROTECT,related_name="lines")
+ description=models.TextField()
+ quantity=models.DecimalField(max_digits=12,decimal_places=3)
+ unit_price=models.DecimalField(max_digits=12,decimal_places=2)
+ line_total=models.DecimalField(max_digits=12,decimal_places=2)
+ created_at=models.DateTimeField(auto_now_add=True)
+ class Meta:db_table="invoice_lines";managed=False
+class PaymentAllocation(models.Model):
+ id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+ payment=models.ForeignKey(Payment,on_delete=models.PROTECT,related_name="allocations")
+ invoice=models.ForeignKey(Invoice,on_delete=models.PROTECT,related_name="allocations")
+ amount=models.DecimalField(max_digits=12,decimal_places=2)
+ allocated_by=models.ForeignKey(StaffUser,on_delete=models.PROTECT,related_name="payment_allocations")
+ created_at=models.DateTimeField(auto_now_add=True)
+ class Meta:db_table="payment_allocations";managed=False
+class SMSReminder(models.Model):
+ id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+ reminder_key=models.TextField(unique=True)
+ facility=models.ForeignKey(Facility,on_delete=models.PROTECT,related_name="sms_reminders")
+ collection=models.ForeignKey(Collection,on_delete=models.PROTECT,null=True,blank=True,related_name="sms_reminders")
+ invoice=models.ForeignKey(Invoice,on_delete=models.PROTECT,null=True,blank=True,related_name="sms_reminders")
+ kind=models.TextField()
+ recipient_phone=models.TextField()
+ message=models.TextField()
+ scheduled_for=models.DateTimeField()
+ status=models.TextField(default="queued")
+ provider_reference=models.TextField(null=True,blank=True)
+ last_error=models.TextField(null=True,blank=True)
+ sent_at=models.DateTimeField(null=True,blank=True)
+ created_at=models.DateTimeField(auto_now_add=True)
+ class Meta:db_table="sms_reminders";managed=False
+class MarketingVisit(models.Model):
+ id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+ marketer=models.ForeignKey(StaffUser,on_delete=models.PROTECT,related_name="marketing_visits")
+ facility=models.ForeignKey(Facility,on_delete=models.PROTECT,null=True,blank=True,related_name="marketing_visits")
+ planned_by=models.ForeignKey(StaffUser,on_delete=models.PROTECT,related_name="planned_marketing_visits")
+ client_name=models.TextField()
+ client_phone=models.TextField(default="")
+ address=models.TextField(default="")
+ planned_for=models.DateTimeField()
+ status=models.TextField(default="scheduled")
+ check_in_latitude=models.FloatField(null=True,blank=True)
+ check_in_longitude=models.FloatField(null=True,blank=True)
+ check_in_accuracy_m=models.FloatField(null=True,blank=True)
+ checked_in_at=models.DateTimeField(null=True,blank=True)
+ contact_name=models.TextField(default="")
+ contact_phone=models.TextField(default="")
+ outcome=models.TextField(default="")
+ notes=models.TextField(default="")
+ follow_up_on=models.DateField(null=True,blank=True)
+ submitted_at=models.DateTimeField(null=True,blank=True)
+ reviewed_by=models.ForeignKey(StaffUser,on_delete=models.PROTECT,null=True,blank=True,related_name="reviewed_marketing_visits")
+ reviewed_at=models.DateTimeField(null=True,blank=True)
+ review_notes=models.TextField(default="")
+ created_at=models.DateTimeField(auto_now_add=True)
+ class Meta:db_table="marketing_visits";managed=False
 class AuditLog(models.Model):
  id=models.BigAutoField(primary_key=True)
  actor=models.ForeignKey(StaffUser,on_delete=models.PROTECT,null=True)
@@ -70,4 +146,4 @@ class AuditLog(models.Model):
  class Meta:db_table="audit_log";managed=False
 
 # Register fleet models with Django's application model loader.
-from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop, LocationPing, StopVerification, FleetSyncEvent, FleetAlert  # noqa: E402,F401
+from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop, LocationPing, StopVerification, FleetSyncEvent, FleetAlert, TrackingSession  # noqa: E402,F401

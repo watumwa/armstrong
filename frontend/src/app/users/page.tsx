@@ -2,7 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 type User={id:string;name:string;email:string;role:string;active:boolean};
-const roles=['Administrator','Supervisor','Waste Collector','Revenue Officer'];
+const roles=['Administrator','Supervisor','Waste Collector','Revenue Officer','Marketer'];
 export default function Users(){const [users,setUsers]=useState<User[]>([]),[error,setError]=useState(''),[name,setName]=useState(''),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[role,setRole]=useState('Waste Collector'),[busy,setBusy]=useState(false);
 async function load(){const r=await fetch('/api/users');const d=await r.json();if(!r.ok){setError(d.error||'Unable to load accounts');return}setUsers(d.users)}
 useEffect(()=>{void load()},[]);

@@ -16,6 +16,10 @@ python manage.py runserver 127.0.0.1:8000
 ```
 Authentication uses the HttpOnly `armstrong_session` JWT issued by Django with the shared **AUTH_SECRET**. Frontend-compatible endpoints are `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`, `/api/facilities`, `/api/users`, `/api/collections`, `/api/payments`, `/api/reports/summary`, and `/api/health`. Mutations enforce roles and record audit actions. The existing `/v1/` REST routes remain available for Django-native integrations, including collector submission and supervisor verification.
 
+## SMS reminder dispatch
+
+The reminder outbox requires an explicit `sms_opt_in` on each facility. To send through Twilio, configure `SMS_PROVIDER=twilio`, `SMS_TWILIO_ACCOUNT_SID`, `SMS_TWILIO_AUTH_TOKEN`, and `SMS_TWILIO_FROM` as server environment variables. Run `python manage.py run_sms_reminders --send` from a scheduler. Without valid provider configuration, rows remain queued; the API never reports them as sent.
+
 To deploy, point the Vercel project at the repository root (`.`), select the **Services** framework preset, set the shared environment variables, and deploy normally. Do not point the project at `frontend/`; that would omit this service. Vercel Services is currently a beta feature, so use a preview deployment to verify `/api/health` and `/login` before promoting production.
 
 Do not store medical patient data in this system. Validate privacy, collection chain-of-custody and statutory retention requirements before production.

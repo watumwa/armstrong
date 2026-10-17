@@ -1,5 +1,5 @@
 /**
- * Provision temporary TEST accounts for all four Armstrong roles.
+ * Provision temporary TEST accounts for all five Armstrong roles.
  * Run on an isolated development database only, after schema.sql.
  * Passwords are generated at runtime and printed once. Never commit them.
  * Refuses to run unless ALLOW_TEST_USERS=yes and NODE_ENV != production.
@@ -13,7 +13,8 @@ const accounts=[
 {role:'Administrator',name:'Test Administrator',email:'admin.test@armstrong.example'},
 {role:'Supervisor',name:'Test Supervisor',email:'supervisor.test@armstrong.example'},
 {role:'Waste Collector',name:'Test Collector',email:'collector.test@armstrong.example'},
-{role:'Revenue Officer',name:'Test Revenue Officer',email:'revenue.test@armstrong.example'}
+{role:'Revenue Officer',name:'Test Revenue Officer',email:'revenue.test@armstrong.example'},
+{role:'Marketer',name:'Test Marketer',email:'marketer.test@armstrong.example'}
 ];
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,max:1});
 try{

@@ -107,3 +107,15 @@ class FleetAlert(models.Model):
     class Meta:
         managed = False
         db_table = "fleet_alerts"
+
+class TrackingSession(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    trip = models.ForeignKey(FleetTrip, on_delete=models.PROTECT, related_name="tracking_sessions")
+    driver = models.ForeignKey(StaffUser, on_delete=models.PROTECT, related_name="fleet_tracking_sessions")
+    consented_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    stopped_at = models.DateTimeField(null=True, blank=True)
+    stop_reason = models.TextField(null=True, blank=True)
+    class Meta:
+        managed = False
+        db_table = "fleet_tracking_sessions"

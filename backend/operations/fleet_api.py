@@ -5,7 +5,7 @@ from django.utils.dateparse import parse_datetime
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop
+from .fleet_models import Vehicle, DriverAssignment, FleetTrip, TripStop, TrackingSession
 from .models import StaffUser, Facility
 from .views import check_role, log
 
@@ -151,6 +151,9 @@ def trip_action(request, trip_id, operation):
                     return error("Trip is not active", 409)
                 trip.status = "completed"
                 trip.ended_at = timezone.now()
+                TrackingSession.objects.filter(trip=trip,stopped_at__isnull=True).update(
+                    stopped_at=trip.ended_at, stop_reason="trip_completed"
+                )
         try:
             trip.save()
         except IntegrityError:

@@ -31,7 +31,7 @@ from .views import check_role, log
 
 SESSION_COOKIE = "armstrong_session"
 SESSION_DURATION = timedelta(hours=8)
-ROLES = {"Administrator", "Supervisor", "Waste Collector", "Revenue Officer"}
+ROLES = {"Administrator", "Supervisor", "Waste Collector", "Revenue Officer", "Marketer"}
 
 
 def _error(message, code=status.HTTP_400_BAD_REQUEST):
@@ -167,6 +167,9 @@ def facilities(request):
     serializer = FacilitySerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     facility = serializer.save(code="AGS-" + uuid.uuid4().hex[:10].upper())
+    if facility.sms_opt_in:
+        facility.sms_opt_in_at = timezone.now()
+        facility.save(update_fields=["sms_opt_in_at"])
     log(request.user, "facility.created", facility)
     return Response({"facility": FacilitySerializer(facility).data}, status=status.HTTP_201_CREATED)
 
@@ -178,9 +181,13 @@ def facility_detail(request, facility_id):
         return Response({"facility": FacilitySerializer(facility).data})
 
     check_role(request.user, "Administrator", "Supervisor")
+    was_opted_in = facility.sms_opt_in
     serializer = FacilitySerializer(facility, data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
     facility = serializer.save()
+    if facility.sms_opt_in != was_opted_in:
+        facility.sms_opt_in_at = timezone.now() if facility.sms_opt_in else None
+        facility.save(update_fields=["sms_opt_in_at"])
     log(request.user, "facility.updated", facility)
     return Response({"facility": FacilitySerializer(facility).data})
 

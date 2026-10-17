@@ -1,9 +1,23 @@
 from django.urls import path
 
-from . import api, fleet_api, fleet_gps, fleet_verification, fleet_reports, fleet_sync, fleet_alerts, fleet_receipts
+from . import accounts_api, api, field_api, fleet_api, fleet_gps, fleet_verification, fleet_reports, fleet_sync, fleet_alerts, fleet_receipts, reminders_api
 
 
 urlpatterns = [
+    path('field/marketers', field_api.marketers),
+    path('field/visits', field_api.visits),
+    path('field/visits/<uuid:visit_id>/check-in', field_api.check_in),
+    path('field/visits/<uuid:visit_id>/submit', field_api.submit_visit),
+    path('field/visits/<uuid:visit_id>/review', field_api.review_visit),
+    path('field/reports/summary', field_api.supervisor_summary),
+    path('accounts/summary', accounts_api.account_summary),
+    path('accounts/invoices', accounts_api.invoices),
+    path('accounts/invoices/<uuid:invoice_id>', accounts_api.invoice_detail),
+    path('accounts/payments/<uuid:payment_id>/confirm', accounts_api.confirm_payment),
+    path('accounts/payments/<uuid:payment_id>/receipt', accounts_api.payment_receipt),
+    path('reminders', reminders_api.reminder_list),
+    path('reminders/queue', reminders_api.queue_reminders),
+    path('reminders/dispatch', reminders_api.dispatch_reminders),
     path('fleet/alerts', fleet_alerts.list_alerts),
     path('fleet/alerts/scan', fleet_alerts.scan_alerts),
     path('fleet/alerts/<uuid:alert_id>/resolve', fleet_alerts.resolve_alert),
@@ -13,6 +27,8 @@ urlpatterns = [
     path('fleet/facilities/<uuid:facility_id>/qr', fleet_verification.facility_qr),
     path('fleet/stops/<uuid:stop_id>/verify', fleet_verification.verify_stop),
     path('fleet/trips/<uuid:trip_id>/location', fleet_gps.report_location),
+    path('fleet/trips/<uuid:trip_id>/tracking/start', fleet_gps.start_tracking),
+    path('fleet/trips/<uuid:trip_id>/tracking/stop', fleet_gps.stop_tracking),
     path('fleet/trips/<uuid:trip_id>/history', fleet_gps.trip_history),
     path('fleet/locations/latest', fleet_gps.latest_locations),
     path('fleet/vehicles', fleet_api.vehicles),
