@@ -49,3 +49,17 @@ class TripStop(models.Model):
     class Meta:
         managed = False
         db_table = "fleet_trip_stops"
+
+class LocationPing(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    trip = models.ForeignKey(FleetTrip, on_delete=models.PROTECT, related_name="location_pings")
+    driver = models.ForeignKey(StaffUser, on_delete=models.PROTECT)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    accuracy_m = models.FloatField()
+    captured_at = models.DateTimeField()
+    received_at = models.DateTimeField(auto_now_add=True)
+    client_event_id = models.UUIDField(unique=True)
+    class Meta:
+        managed = False
+        db_table = "fleet_location_pings"
