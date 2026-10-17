@@ -80,3 +80,17 @@ class StopVerification(models.Model):
     class Meta:
         managed = False
         db_table = "fleet_stop_verifications"
+
+class FleetSyncEvent(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    driver = models.ForeignKey(StaffUser, on_delete=models.PROTECT)
+    client_event_id = models.UUIDField()
+    event_type = models.TextField()
+    trip_stop = models.ForeignKey(TripStop, on_delete=models.PROTECT)
+    status = models.TextField()
+    result = models.JSONField(default=dict)
+    received_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        managed = False
+        db_table = "fleet_sync_events"
+        constraints = [models.UniqueConstraint(fields=["driver", "client_event_id"], name="fleet_sync_driver_event_unique")]
