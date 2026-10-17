@@ -53,3 +53,18 @@ CREATE TABLE IF NOT EXISTS fleet_trip_stops (
  UNIQUE(trip_id,sequence), UNIQUE(trip_id,facility_id)
 );
 CREATE INDEX IF NOT EXISTS fleet_trips_driver_schedule ON fleet_trips(driver_id,scheduled_for DESC);
+
+-- Phase 2: consent-based GPS reporting during active trips.
+CREATE TABLE IF NOT EXISTS fleet_location_pings (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ trip_id uuid NOT NULL REFERENCES fleet_trips(id),
+ driver_id uuid NOT NULL REFERENCES users(id),
+ latitude double precision NOT NULL CHECK(latitude BETWEEN -90 AND 90),
+ longitude double precision NOT NULL CHECK(longitude BETWEEN -180 AND 180),
+ accuracy_m double precision NOT NULL CHECK(accuracy_m >= 0 AND accuracy_m <= 10000),
+ captured_at timestamptz NOT NULL,
+ received_at timestamptz NOT NULL DEFAULT now(),
+ client_event_id uuid NOT NULL UNIQUE
+);
+CREATE INDEX IF NOT EXISTS fleet_location_trip_time ON fleet_location_pings(trip_id,captured_at DESC);
+CREATE INDEX IF NOT EXISTS fleet_location_driver_time ON fleet_location_pings(driver_id,received_at DESC);
