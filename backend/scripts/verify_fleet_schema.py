@@ -7,6 +7,7 @@ TABLES = {
     "fleet_assignments": {"id", "vehicle_id", "driver_id", "assigned_by_id", "ended_at"},
     "fleet_trips": {"id", "vehicle_id", "driver_id", "created_by_id", "status", "scheduled_for"},
     "fleet_trip_stops": {"id", "trip_id", "facility_id", "sequence", "status"},
+    "fleet_stop_verifications": {"id", "trip_stop_id", "driver_id", "event_id", "within_geofence", "qr_verified"},
     "fleet_location_pings": {"id", "trip_id", "driver_id", "latitude", "longitude", "accuracy_m", "client_event_id"},
 }
 with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
