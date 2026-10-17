@@ -16,12 +16,11 @@ def list_alerts(request):
         "trip_id":str(a.trip_id) if a.trip_id else None,"created_at":a.created_at.isoformat(),
         "resolved_at":a.resolved_at.isoformat() if a.resolved_at else None} for a in qs[:100]]})
 
-@api_view(["POST"])
-def scan_alerts(request):
-    check_role(request.user,"Administrator","Supervisor")
-    now=timezone.now()
+def detect_alerts(now=None):
+    """Idempotent fleet exception scan, callable by a scheduled command."""
+    now=now or timezone.now()
     new=0
-    for trip in FleetTrip.objects.select_related("vehicle").filter(status__in=["active","planned"])[:500]:
+    for trip in FleetTrip.objects.select_related("vehicle").filter(status__in=["active","planned"]).order_by("id").iterator(chunk_size=200):
         category=None
         if trip.status=="planned" and trip.scheduled_for<now-timedelta(hours=2):
             category="overdue_departure"
@@ -35,7 +34,12 @@ def scan_alerts(request):
                 "trip":trip,"severity":"warning","category":category,
                 "message":f"Trip {trip.id} ({trip.vehicle.registration}) requires attention: {category.replace('_',' ')}"})
             if created:new+=1
-    return Response({"created":new,"note":"Scans up to 500 planned or active trips. Alerts remain until manually resolved."})
+    return new
+
+@api_view(["POST"])
+def scan_alerts(request):
+    check_role(request.user,"Administrator","Supervisor")
+    return Response({"created":detect_alerts(),"note":"All planned and active trips scanned; duplicate alerts are suppressed."})
 
 @api_view(["POST"])
 def resolve_alert(request,alert_id):
