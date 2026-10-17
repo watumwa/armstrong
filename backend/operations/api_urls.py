@@ -1,9 +1,15 @@
 from django.urls import path
 
-from . import api
+from . import api, fleet_api
 
 
 urlpatterns = [
+    path('fleet/vehicles', fleet_api.vehicles),
+    path('fleet/drivers', fleet_api.drivers),
+    path('fleet/assignments', fleet_api.assignments),
+    path('fleet/assignments/<uuid:assignment_id>/end', fleet_api.end_assignment),
+    path('fleet/trips', fleet_api.trips),
+    path('fleet/trips/<uuid:trip_id>/<str:operation>', fleet_api.trip_action),
     path("health", api.health),
     path("auth/login", api.login),
     path("auth/logout", api.logout),
