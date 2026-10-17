@@ -23,7 +23,7 @@ export default function DriverTracking(){
     const d=await r.json();if(!r.ok)throw Error(d.error||'GPS update failed');
     last.current=now;setCount(n=>n+1);setMessage('Last GPS update sent at '+new Date().toLocaleTimeString());
    }catch(e){setMessage('Location not sent: '+String(e))}finally{inFlight.current=false}
-  },err=>{setMessage('GPS unavailable: '+err.message);stop()},{enableHighAccuracy:true,maximumAge:10000,timeout:20000});
+  },err=>{stop();setMessage('GPS unavailable: '+err.message)},{enableHighAccuracy:true,maximumAge:10000,timeout:20000});
   setRunning(true);
  }
  return <main style={{maxWidth:640,margin:'auto',padding:24}}><Link href="/fleet">← Fleet</Link><h1>Driver GPS tracking</h1><p>Tracking is voluntary and only operates while this page is active and an assigned trip is running. It stops when you select Stop or leave the page. Browser tracking may pause when your phone locks.</p><label htmlFor="trip">Active assigned trip</label><select id="trip" disabled={running} style={{display:'block',padding:12,width:'100%',margin:'12px 0'}} value={selected} onChange={e=>setSelected(e.target.value)}><option value="">Select trip</option>{trips.map(t=><option key={t.id} value={t.id}>{t.registration} — {t.driver_name}</option>)}</select><button onClick={running?stop:start} disabled={!running&&!selected} style={{padding:16,borderRadius:10,background:running?'#9b2525':'#167a57',color:'white',border:0}}>{running?'Stop tracking':'Start tracking'}</button><p role="status" style={{marginTop:20}}>{message}</p><p>GPS updates accepted in this session: {count}</p><p>No GPS locations are collected while tracking is off.</p></main>
